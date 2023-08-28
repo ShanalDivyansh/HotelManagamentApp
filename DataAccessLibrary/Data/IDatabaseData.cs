@@ -8,5 +8,7 @@ namespace DataAccessLibrary.Data
 		void CheckInGuest(int bookingId);
 		List<RoomTypeModel> GetAvailableRooms(DateTime startDate, DateTime endDate);
 		List<BookingFullModel> SearchBookings(string lastName);
-	}
+		public RoomTypeModel GetRoomTypeById(int id);
+
+    }
 }

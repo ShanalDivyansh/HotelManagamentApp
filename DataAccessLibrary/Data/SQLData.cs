@@ -25,27 +25,28 @@ namespace DataAccessLibrary.Data
 
 		public void BookGuest(string firstName, string lastName, DateTime startDate, DateTime endDate, int roomTypeId)
 		{
-			GuestsModel guest = _db.LoadData<GuestsModel, dynamic>("dbo.spGuests_Insert", new { firstName, lastName }, connectionStringName, true).First();
-			RoomTypeModel roomType = _db.LoadData<RoomTypeModel, dynamic>("select * from dbo.RoomTypes where Id = @Id",
+			GuestsModel guest = _db.LoadData<GuestsModel, dynamic>("dbo.spGuests_Insert", new { firstName, lastName }, connectionStringName, true).FirstOrDefault();
+			RoomTypeModel roomType = _db.LoadData<RoomTypeModel, dynamic>("select * from dbo.RoomType where Id = @Id",
 																		  new { Id = roomTypeId },
 																		  connectionStringName,
-																		  false).First();
+																		  false).FirstOrDefault();
 
 			TimeSpan timeStaying = endDate.Date.Subtract(startDate.Date);
 
 
 			List<RoomModel> availableRooms = _db.LoadData<RoomModel, dynamic>("dbo.spRooms_GetAvailableRooms",
-																				new { startDate, endDate, roomTypeId },
+																				new { startDate, endDate,roomTypeId },
 																				connectionStringName,
 																				true);
 
-			_db.SaveData("dbo.spBookings_Insert",
+
+            _db.SaveData("dbo.spBookings_Insert",
 						  new
 						  {
-							  roomId = availableRooms.First().Id,
+							  roomId = availableRooms.FirstOrDefault().Id,
 							  guestId = guest.Id,
-							  startDate = startDate,
-							  endDate = endDate,
+                              startDate = startDate,
+                              endDate = endDate,
 							  totalCost = timeStaying.Days * roomType.Price
 						  },
 						  connectionStringName,
@@ -60,5 +61,12 @@ namespace DataAccessLibrary.Data
 		{
 			_db.SaveData("dbo.spBookings_CheckIn", new { Id = bookingId }, connectionStringName, true);
 		}
-	}
+        public RoomTypeModel GetRoomTypeById(int id)
+        {
+            return _db.LoadData<RoomTypeModel, dynamic>("select [Id], [Title], [Description], [Price] from dbo.RoomType where Id = @id;",
+                                                        new { id },
+                                                        connectionStringName,
+                                                        false).FirstOrDefault();
+        }
+    }
 }

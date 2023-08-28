@@ -20,12 +20,13 @@ namespace DataAccessLibrary.Databases
 		}
 		public List<T> LoadData<T, U>(string sqlStatement, U parameters, string connectionStringName, bool isStoredProcedure = false)
 		{
-			CommandType commandType = CommandType.Text;
+            string connectionString = _config.GetConnectionString(connectionStringName);
+            CommandType commandType = CommandType.Text;
 			if (isStoredProcedure == true)
 			{
 				commandType = CommandType.StoredProcedure;
 			}
-			using (IDbConnection con = new SqlConnection(connectionStringName))
+			using (IDbConnection con = new SqlConnection(connectionString))
 			{
 				List<T> rows = con.Query<T>(sqlStatement, parameters, commandType: commandType).ToList();
 				return rows;
@@ -33,12 +34,13 @@ namespace DataAccessLibrary.Databases
 		}
 		public void SaveData<T>(string sqlStatement, T parameters, string connectionStringName, bool isStoredProcedure = false)
 		{
-			CommandType commandType = CommandType.Text;
+            string connectionString = _config.GetConnectionString(connectionStringName);
+            CommandType commandType = CommandType.Text;
 			if (isStoredProcedure == true)
 			{
 				commandType = CommandType.StoredProcedure;
 			}
-			using (IDbConnection con = new SqlConnection(connectionStringName))
+			using (IDbConnection con = new SqlConnection(connectionString))
 			{
 				con.Execute(sqlStatement, parameters, commandType: commandType);
 			}
